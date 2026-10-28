@@ -1,6 +1,6 @@
 import sqlite3
 from pathlib import Path
-from src.package.table_data import participants
+from .table_data import participants, visits, measurements
 
 def create_schema(connection: sqlite3.Connection) -> None:
     file_path = Path("sql/schema.sql")
@@ -17,5 +17,17 @@ connection.executemany(
     participants
 )
 
-cursor = connection.execute("SELECT * FROM participants;")
+connection.executemany(
+    "INSERT INTO visits (person_id, visit_date, visit_length)"
+    "VALUES (?, ?, ?)",
+    visits
+)
+
+connection.executemany(
+    "INSERT INTO measurements (visit_id, weight, height, waist)"
+    "VALUES (?, ?, ?, ?)",
+    measurements
+)
+
+cursor = connection.execute("SELECT * FROM measurements;")
 print(cursor.fetchall())
